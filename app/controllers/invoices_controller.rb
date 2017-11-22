@@ -17,7 +17,19 @@ class InvoicesController < CrudController
     respond_with(entry, success: cancelled, location: group_invoices_path(parent))
   end
 
+  def show
+    respond_to do |format|
+      format.html { super }
+      format.pdf { render_pdf }
+    end
+  end
+
   private
+
+  def render_pdf
+    pdf = Export::Pdf::Invoice.render(entry, params[:articles], params[:esr])
+    send_data pdf, type: :pdf, disposition: 'inline', filename: pdf_filename
+  end
 
   def list_entries
     scope = super.includes(recipient: [:groups, :roles]).references(:recipient).list
@@ -26,6 +38,10 @@ class InvoicesController < CrudController
 
   def authorize_class
     authorize!(:create, parent.invoices.build)
+  end
+
+  def pdf_filename
+    "#{entry.title.tr(' ', '_')}_#{entry.sequence_number}.pdf"
   end
 
 end

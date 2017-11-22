@@ -10,4 +10,7 @@ module InvoicesHelper
     badge(invoice.state_label, type)
   end
 
+  def invoices_dropdown
+    Dropdown::InvoicesExport.new(self, params).to_s
+  end
 end

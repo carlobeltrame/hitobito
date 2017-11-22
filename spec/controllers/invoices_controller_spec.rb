@@ -45,4 +45,13 @@ describe InvoicesController do
     expect(flash[:notice]).to eq 'Rechnung wurde storniert.'
   end
 
+  context '#show' do
+    before { sign_in(person) }
+
+    it 'exports pdf' do
+      get :show, group_id: group.id, id: invoices(:invoice), format: :pdf
+      expect(response.content_type).to eq('application/pdf')
+    end
+  end
+
 end
